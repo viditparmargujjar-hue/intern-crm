@@ -7,7 +7,7 @@ export const Route = createFileRoute("/api/public/bootstrap-admin")({
   server: {
     handlers: {
       POST: async () => {
-        const password = process.env.ADMIN_INITIAL_PASSWORD;
+        const password = process.env["ADMIN_INITIAL_PASSWORD"];
         if (!password) return Response.json({ error: "not configured" }, { status: 500 });
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { count } = await supabaseAdmin
