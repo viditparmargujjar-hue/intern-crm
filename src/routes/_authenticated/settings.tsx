@@ -88,7 +88,7 @@ function SettingsPage() {
 
   const save = useMutation({
     mutationFn: () =>
-      updateProfile(profile.data!.id, {
+      updateProfile({
         name,
         email,
         notify_email: notifyEmail,
