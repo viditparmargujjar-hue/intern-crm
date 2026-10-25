@@ -1,14 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 
 import { PageHeader } from "@/components/layout/PageHeader";
 import { EmptyState, ErrorState, LoadingRows, Panel, PanelHeader } from "@/components/crm/Surfaces";
 import { isAdmin } from "@/lib/auth";
-import { listAccounts, listRegistrations, reviewRegistration } from "@/lib/admin.functions";
+import { listAccounts, listRegistrations } from "@/lib/admin.functions";
 import { formatDate, isOverdue } from "@/lib/crm";
 import { useState } from "react";
 import { CalendarClock, ClipboardCheck, Hourglass, Search, UserCheck, UserRound, Users } from "lucide-react";
@@ -86,7 +84,6 @@ function AdminPage() {
         <StatCard label="Follow-ups Due" value={dash(followUps, allFu.filter((f) => f.status === "Pending" && (isOverdue(f) || new Date(f.due_at).getTime() - Date.now() < 2 * 86_400_000)).length)} hint="Overdue or within 48h" icon={<CalendarClock className="size-4" />} tone="lost" />
         <StatCard label="Completed Tasks" value={dash(followUps, allFu.filter((f) => f.status === "Completed").length)} icon={<ClipboardCheck className="size-4" />} tone="converted" />
       </section>
-      <InternApprovals />
       <Panel>
         <PanelHeader title="Accounts" />
         <div className="mb-4 flex flex-wrap gap-2">
@@ -154,74 +151,5 @@ function AdminPage() {
         {activities.isPending ? <LoadingRows rows={3} /> : <ActivityTimeline activities={acts} />}
       </Panel>
     </div>
-  );
-}
-
-function InternApprovals() {
-  const qc = useQueryClient();
-  const fetchRegs = useServerFn(listRegistrations);
-  const review = useServerFn(reviewRegistration);
-  const regs = useQuery({ queryKey: ["registrations"], queryFn: () => fetchRegs() });
-  const mutation = useMutation({
-    mutationFn: (v: { id: string; status: "approved" | "rejected" }) => review({ data: v }),
-    onSuccess: (r) => {
-      toast.success(`Request ${r.status}`, {
-        description: "Email notifications are not set up yet, so the intern was not emailed.",
-      });
-      qc.invalidateQueries({ queryKey: ["registrations"] });
-    },
-    onError: (e) => toast.error((e as Error).message),
-  });
-
-  return (
-    <Panel>
-      <PanelHeader title="Intern Approvals" />
-      <p className="text-muted-foreground mb-3 text-xs">
-        Email alerts to crm1intern@gmail.com are not configured yet — new requests appear here and in your notifications.
-      </p>
-      {regs.isLoading ? (
-        <LoadingRows />
-      ) : regs.error ? (
-        <ErrorState message={(regs.error as Error).message} />
-      ) : !regs.data?.length ? (
-        <EmptyState title="No registration requests" description="New intern sign-ups appear here." />
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-muted-foreground text-left text-xs">
-              <tr>
-                <th className="py-2 pr-4">Name</th>
-                <th className="py-2 pr-4">Email</th>
-                <th className="py-2 pr-4">Registered</th>
-                <th className="py-2 pr-4">Status</th>
-                <th className="py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {regs.data.map((r) => (
-                <tr key={r.id} className="border-t border-border">
-                  <td className="py-2.5 pr-4 font-medium">{r.full_name}</td>
-                  <td className="py-2.5 pr-4">{r.email}</td>
-                  <td className="py-2.5 pr-4">{formatDate(r.created_at)}</td>
-                  <td className="py-2.5 pr-4">
-                    <Badge variant={r.status === "approved" ? "default" : r.status === "rejected" ? "destructive" : "secondary"} className="capitalize">
-                      {r.status}
-                    </Badge>
-                  </td>
-                  <td className="flex gap-2 py-2.5">
-                    <Button size="sm" disabled={mutation.isPending || r.status === "approved"} onClick={() => mutation.mutate({ id: r.id, status: "approved" })}>
-                      Approve
-                    </Button>
-                    <Button size="sm" variant="outline" disabled={mutation.isPending || r.status === "rejected"} onClick={() => mutation.mutate({ id: r.id, status: "rejected" })}>
-                      Reject
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </Panel>
   );
 }

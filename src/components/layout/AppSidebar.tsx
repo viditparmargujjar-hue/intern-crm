@@ -1,4 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Activity as ActivityIcon,
@@ -10,8 +10,10 @@ import {
   LogOut,
   Settings,
   ShieldCheck,
+  UserCheck,
   UserRound,
 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -19,6 +21,7 @@ import { Logo } from "@/components/layout/Logo";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { ThemeSwitcher } from "@/components/layout/ThemeSwitcher";
 import { supabase } from "@/integrations/supabase/client";
+import { listRegistrations } from "@/lib/admin.functions";
 import { useCurrentUser } from "@/lib/auth";
 import { initials } from "@/lib/crm";
 import { cn } from "@/lib/utils";
@@ -47,8 +50,20 @@ export function SidebarContents({
   const navigate = useNavigate();
   const items =
     me?.role === "admin"
-      ? [...navItems, { label: "Admin Panel", to: "/admin", icon: ShieldCheck } as const]
+      ? [
+          ...navItems,
+          { label: "Admin Panel", to: "/admin", icon: ShieldCheck } as const,
+          { label: "Intern Approvals", to: "/approvals", icon: UserCheck } as const,
+        ]
       : navItems;
+  const fetchRegs = useServerFn(listRegistrations);
+  const regs = useQuery({
+    queryKey: ["registrations"],
+    queryFn: () => fetchRegs(),
+    enabled: me?.role === "admin",
+    refetchInterval: 60_000,
+  });
+  const pendingCount = (regs.data ?? []).filter((r) => r.status === "pending").length;
 
   async function signOut() {
     const wasAdmin = me?.role === "admin";
@@ -111,6 +126,17 @@ export function SidebarContents({
               ) : null}
               <item.icon className="size-4 shrink-0" />
               {!collapsed ? item.label : null}
+              {item.to === "/approvals" && pendingCount > 0 ? (
+                <span
+                  aria-label={`${pendingCount} pending`}
+                  className={cn(
+                    "bg-destructive text-destructive-foreground grid min-w-5 place-items-center rounded-full px-1.5 text-[10px] font-bold",
+                    collapsed ? "absolute top-0.5 right-0.5" : "ml-auto",
+                  )}
+                >
+                  {pendingCount}
+                </span>
+              ) : null}
             </Link>
           );
         })}
