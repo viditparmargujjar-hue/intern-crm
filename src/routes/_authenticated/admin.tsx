@@ -86,7 +86,6 @@ function AdminPage() {
         <StatCard label="Follow-ups Due" value={dash(followUps, allFu.filter((f) => f.status === "Pending" && (isOverdue(f) || new Date(f.due_at).getTime() - Date.now() < 2 * 86_400_000)).length)} hint="Overdue or within 48h" icon={<CalendarClock className="size-4" />} tone="lost" />
         <StatCard label="Completed Tasks" value={dash(followUps, allFu.filter((f) => f.status === "Completed").length)} icon={<ClipboardCheck className="size-4" />} tone="converted" />
       </section>
-      <InternApprovals />
       <Panel>
         <PanelHeader title="Accounts" />
         <div className="mb-4 flex flex-wrap gap-2">
