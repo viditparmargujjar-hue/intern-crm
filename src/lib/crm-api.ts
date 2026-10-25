@@ -308,22 +308,37 @@ export async function bulkAssignLeads(leadIds: string[], userIds: string[]): Pro
 
 /* ---------------------------------- user ---------------------------------- */
 
+/** Signed-in user's settings row (id = auth user id); defaults when none saved yet. */
 export async function fetchProfile(): Promise<AppUser | null> {
-  const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth.user;
+  if (!user) return null;
+  const { data, error } = await supabase.from("users").select("*").eq("id", user.id).maybeSingle();
   if (error) throw error;
-  return data;
+  if (data) return data;
+  return {
+    id: user.id,
+    name: (user.user_metadata?.["full_name"] as string | undefined) ?? user.email ?? "",
+    email: user.email ?? "",
+    notify_email: true,
+    notify_followups: true,
+    preferences: {},
+    created_at: new Date().toISOString(),
+  };
 }
 
-export async function updateProfile(id: string, values: TablesUpdate<"users">): Promise<AppUser> {
+/** Creates or updates the signed-in user's own settings row. */
+export async function updateProfile(values: TablesUpdate<"users">): Promise<AppUser> {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("You are signed out. Please sign in again.");
   const { data, error } = await supabase
     .from("users")
-    .update(values)
-    .eq("id", id)
+    .upsert({
+      ...values,
+      id: auth.user.id,
+      name: values.name ?? auth.user.email ?? "User",
+      email: values.email ?? auth.user.email ?? "",
+    })
     .select()
     .single();
   if (error) throw error;
