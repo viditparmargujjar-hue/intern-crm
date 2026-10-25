@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedApprovalsRouteImport } from './routes/_authenticated/approvals'
 import { Route as AuthenticatedCustomersRouteImport } from './routes/_authenticated/customers'
 import { Route as AuthenticatedFollowUpsRouteImport } from './routes/_authenticated/follow-ups'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
@@ -52,6 +53,11 @@ const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedApprovalsRoute = AuthenticatedApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCustomersRoute = AuthenticatedCustomersRouteImport.update({
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/activities': typeof AuthenticatedActivitiesRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/approvals': typeof AuthenticatedApprovalsRoute
   '/customers': typeof AuthenticatedCustomersRoute
   '/follow-ups': typeof AuthenticatedFollowUpsRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/activities': typeof AuthenticatedActivitiesRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/approvals': typeof AuthenticatedApprovalsRoute
   '/customers': typeof AuthenticatedCustomersRoute
   '/follow-ups': typeof AuthenticatedFollowUpsRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/approvals': typeof AuthenticatedApprovalsRoute
   '/_authenticated/customers': typeof AuthenticatedCustomersRoute
   '/_authenticated/follow-ups': typeof AuthenticatedFollowUpsRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRouteWithChildren
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/activities'
     | '/admin'
+    | '/approvals'
     | '/customers'
     | '/follow-ups'
     | '/leads'
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/activities'
     | '/admin'
+    | '/approvals'
     | '/customers'
     | '/follow-ups'
     | '/pipeline'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/activities'
     | '/_authenticated/admin'
+    | '/_authenticated/approvals'
     | '/_authenticated/customers'
     | '/_authenticated/follow-ups'
     | '/_authenticated/leads'
@@ -250,6 +262,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/approvals': {
+      id: '/_authenticated/approvals'
+      path: '/approvals'
+      fullPath: '/approvals'
+      preLoaderRoute: typeof AuthenticatedApprovalsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/customers': {
@@ -334,6 +353,7 @@ const AuthenticatedLeadsRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedApprovalsRoute: typeof AuthenticatedApprovalsRoute
   AuthenticatedCustomersRoute: typeof AuthenticatedCustomersRoute
   AuthenticatedFollowUpsRoute: typeof AuthenticatedFollowUpsRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRouteWithChildren
@@ -345,6 +365,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedActivitiesRoute: AuthenticatedActivitiesRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedApprovalsRoute: AuthenticatedApprovalsRoute,
   AuthenticatedCustomersRoute: AuthenticatedCustomersRoute,
   AuthenticatedFollowUpsRoute: AuthenticatedFollowUpsRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRouteWithChildren,
