@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 /**
  * Per-user CRM preferences, stored in the `preferences` jsonb column of
  * public.users and merged with defaults so old rows keep working.
@@ -50,5 +51,8 @@ export function parsePreferences(raw: unknown): CrmPreferences {
 /** Current user's profile row plus parsed preferences. */
 export function usePreferences() {
   const profile = useQuery({ queryKey: ["profile"], queryFn: fetchProfile, staleTime: 60_000 });
-  return { ...profile, preferences: parsePreferences(profile.data?.preferences) };
+  // Memoised so effects that depend on preferences don't re-run (and reset forms) every render.
+  const raw = profile.data?.preferences;
+  const preferences = useMemo(() => parsePreferences(raw), [raw]);
+  return { ...profile, preferences };
 }
