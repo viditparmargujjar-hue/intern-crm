@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { StatCard } from "@/components/crm/Surfaces";
 import { ActivityTimeline } from "@/components/crm/ActivityTimeline";
 import { fetchActivities, fetchFollowUps, fetchLeads } from "@/lib/crm-api";
-import { demoActivities, demoFollowUps, demoLeads } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async ({ context }) => {
@@ -46,11 +45,9 @@ function AdminPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selected, setSelected] = useState<string | null>(null);
 
-  // Display-only Demo Data while the workspace has no real leads.
-  const isDemo = leads.isSuccess && leads.data.length === 0;
-  const allLeads = isDemo ? demoLeads : (leads.data ?? []);
-  const allFu = isDemo && !followUps.data?.length ? demoFollowUps : (followUps.data ?? []);
-  const acts = (isDemo && !activities.data?.length ? demoActivities : (activities.data ?? [])).slice(0, 6);
+  const allLeads = leads.data ?? [];
+  const allFu = followUps.data ?? [];
+  const acts = (activities.data ?? []).slice(0, 6);
 
   const regByUser = new Map((regs.data ?? []).map((r) => [r.user_id, r.status]));
   const interns = (accounts.data ?? []).filter((a) => a.role === "intern");
@@ -70,12 +67,6 @@ function AdminPage() {
   return (
     <div className="premium-dashboard premium-admin space-y-6">
       <PageHeader title="Admin Panel" description="All CRM accounts and their roles." />
-      {isDemo ? (
-        <p className="text-muted-foreground text-xs">
-          <span className="bg-status-followup text-background mr-2 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase">Demo Data</span>
-          Lead, task and activity figures use sample records until real leads exist.
-        </p>
-      ) : null}
       <section className="dashboard-stats grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-6">
         <StatCard label="Total Interns" value={dash(accounts, interns.length)} icon={<Users className="size-4" />} tone="brand" />
         <StatCard label="Pending Approvals" value={dash(regs, pending)} hint={pending ? "Needs review" : "All clear"} icon={<Hourglass className="size-4" />} tone="followup" />

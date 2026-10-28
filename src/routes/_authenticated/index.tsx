@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { BadgeCheck, CalendarClock, CheckCircle2, ClipboardCheck, KanbanSquare, ListTodo, Plus, Sparkles, UserRound } from "lucide-react";
 import { FollowUpFormDialog } from "@/components/crm/FollowUpFormDialog";
-import { demoActivities, demoFollowUps, demoLeads } from "@/lib/demo-data";
 
 import { ConversionFunnel, StatusDonut } from "@/components/crm/DashboardCharts";
 import { useCurrentUser } from "@/lib/auth";
@@ -50,10 +49,9 @@ function Dashboard() {
   const followUps = useQuery({ queryKey: ["follow_ups"], queryFn: fetchFollowUps });
   const activities = useQuery({ queryKey: ["activities"], queryFn: fetchActivities });
 
-  // Show display-only Demo Data until the workspace has real leads.
-  const isDemo = leads.isSuccess && leads.data.length === 0;
-  const allLeads = isDemo ? demoLeads : (leads.data ?? []);
-  const allFollowUps = isDemo && !followUps.data?.length ? demoFollowUps : (followUps.data ?? []);
+  const isDemo = false;
+  const allLeads = leads.data ?? [];
+  const allFollowUps = followUps.data ?? [];
 
   const totalLeads = allLeads.length;
   const newLeads = allLeads.filter((lead) => lead.status === "New").length;
@@ -80,7 +78,7 @@ function Dashboard() {
   const upcoming = allFollowUps
     .filter((item) => item.status === "Pending" && !isOverdue(item))
     .slice(0, 4);
-  const recentActivities = (isDemo && !activities.data?.length ? demoActivities : (activities.data ?? [])).slice(0, 5);
+  const recentActivities = (activities.data ?? []).slice(0, 5);
 
   const leadNames = new Map(allLeads.map((lead) => [lead.id, lead.full_name]));
   const customerNames = new Map((customers.data ?? []).map((item) => [item.id, item.name]));
@@ -119,14 +117,6 @@ function Dashboard() {
         }
       />
 
-      {isDemo ? (
-        <div className="bg-status-followup/10 text-status-followup mb-4 flex items-center gap-2 rounded-lg border border-current/20 px-3 py-2 text-xs font-medium">
-          <span className="bg-status-followup text-background rounded px-1.5 py-0.5 text-[10px] font-bold uppercase">
-            Demo Data
-          </span>
-          Sample records for preview only — they disappear once you add your first lead.
-        </div>
-      ) : null}
 
       <section className="dashboard-stats mb-6 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 xl:grid-cols-7">
         <StatCard
