@@ -185,12 +185,16 @@ export function SidebarContents({
             </button>
           </div>
         </div>
-        <p
-          className="text-muted-foreground truncate px-1 text-center text-[10px] tabular-nums"
-          title={`Build ${BUILD_ID} · published ${formatDateTime(BUILD_TIME || null)}`}
+        <div
+          className="text-muted-foreground px-1 text-center text-[10px] leading-relaxed tabular-nums"
+          title={`Version ${BUILD_ID} · Built ${formatDateTime(BUILD_TIME || null)} (local time). Exact publication time is unavailable.`}
+          aria-label={`Version ${BUILD_ID}, built ${formatDateTime(BUILD_TIME || null)}`}
         >
-          {collapsed ? `v${BUILD_ID.slice(-4)}` : `v${BUILD_ID} · ${formatDateTime(BUILD_TIME || null)}`}
-        </p>
+          <p className="truncate">{collapsed ? "Version" : `Version ${BUILD_ID}`}</p>
+          {!collapsed ? (
+            <p className="truncate">Built <time dateTime={BUILD_TIME || undefined}>{formatDateTime(BUILD_TIME || null)}</time></p>
+          ) : null}
+        </div>
       </div>
     </div>
   );

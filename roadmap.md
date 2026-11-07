@@ -1,5 +1,7 @@
 # Setup tasks for remixed project
 
+- [x] Add compact, immutable deployment version and accurately labeled build timestamp in desktop/mobile navigation; exact last-published time unavailable from the platform.
+
 - [x] Polish intern/admin login and dashboards with scoped presentation-only styling.
 - [x] Step 1 — Clear copied Drizzle migrations and rescaffold an empty migration set
 - [x] Admin Login entry point on the intern login page

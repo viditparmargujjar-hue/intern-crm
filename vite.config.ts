@@ -8,7 +8,7 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 // Stamped once per build so the live site can show which build it is serving.
 const buildTime = new Date().toISOString();
-const buildId = buildTime.replace(/\D/g, "").slice(0, 12);
+const buildId = buildTime.replace(/\D/g, "");
 
 export default defineConfig({
   tanstackStart: {
