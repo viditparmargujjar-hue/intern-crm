@@ -23,7 +23,8 @@ import { ThemeSwitcher } from "@/components/layout/ThemeSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { listRegistrations } from "@/lib/admin.functions";
 import { useCurrentUser } from "@/lib/auth";
-import { initials } from "@/lib/crm";
+import { BUILD_ID, BUILD_TIME } from "@/lib/build-info";
+import { formatDateTime, initials } from "@/lib/crm";
 import { cn } from "@/lib/utils";
 
 export const navItems = [
@@ -183,6 +184,16 @@ export function SidebarContents({
               <LogOut className="size-4" />
             </button>
           </div>
+        </div>
+        <div
+          className="text-muted-foreground px-1 text-center text-[10px] leading-relaxed tabular-nums"
+          title={`Version ${BUILD_ID} · Built ${formatDateTime(BUILD_TIME || null)} (local time). Exact publication time is unavailable.`}
+          aria-label={`Version ${BUILD_ID}, built ${formatDateTime(BUILD_TIME || null)}`}
+        >
+          <p className="truncate">{collapsed ? "Version" : `Version ${BUILD_ID}`}</p>
+          {!collapsed ? (
+            <p className="truncate">Built <time dateTime={BUILD_TIME || undefined}>{formatDateTime(BUILD_TIME || null)}</time></p>
+          ) : null}
         </div>
       </div>
     </div>
