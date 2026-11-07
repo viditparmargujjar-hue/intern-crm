@@ -14,6 +14,8 @@ it("uses the injected immutable build stamp instead of the visitor's current tim
 });
 
 it("does not invent a timestamp when build metadata is missing", async () => {
+  vi.stubGlobal("__BUILD_TIME__", undefined);
+  vi.stubGlobal("__BUILD_ID__", undefined);
   const info = await import("./build-info");
   expect(info.BUILD_TIME).toBe("");
   expect(info.BUILD_ID).toBe("dev");
