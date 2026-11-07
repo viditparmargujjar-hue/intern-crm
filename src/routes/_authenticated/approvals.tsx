@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { RefreshCw, Search } from "lucide-react";
+import { CheckCircle2, RefreshCw, Search, UserCheck, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { EmptyState, ErrorState, LoadingRows, Panel } from "@/components/crm/Surfaces";
+import { ErrorState, LoadingRows, Panel } from "@/components/crm/Surfaces";
 import { PageHeader } from "@/components/layout/PageHeader";
 import {
   AlertDialog,
@@ -71,31 +71,55 @@ function ApprovalsPage() {
       (tab === "all" || r.status === tab) &&
       (!q || (r.full_name ?? "").toLowerCase().includes(q) || (r.email ?? "").toLowerCase().includes(q)),
   );
+  const emptyTitle = q ? "No matching registrations" : tab === "pending" ? "No pending registrations" : tab === "approved" ? "No approved registrations" : tab === "rejected" ? "No rejected registrations" : "No registrations yet";
+  const emptyDescription = q
+    ? `No ${tab === "all" ? "" : `${tab} `}registrations match your search.`
+    : tab === "pending"
+      ? all.length ? "All registrations have been reviewed. No interns are waiting for approval." : "No interns are waiting for approval."
+      : tab === "approved" ? "No intern registrations have been approved yet."
+      : tab === "rejected" ? "No intern registrations have been rejected."
+      : "There are no intern registrations to review.";
 
   return (
     <div className="premium-dashboard premium-admin space-y-6">
-      <PageHeader title="Intern Approvals" description="Review new intern registrations before they can use the CRM." />
-      <Panel>
+      <PageHeader title="Intern Approvals" description="Intern registration requests and review history." />
+      <Panel className="p-4 sm:p-6">
+        <div className="border-border mb-5 flex items-center gap-3 border-b pb-4" role="status" aria-live="polite">
+          <UserCheck className="text-primary size-5 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold">{regs.isLoading ? "Loading registrations…" : regs.isError ? "Registrations unavailable" : `${count("pending")} pending ${count("pending") === 1 ? "registration" : "registrations"}`}</p>
+            {regs.isSuccess ? <p className="text-muted-foreground mt-1 text-xs">{count("pending") ? "Awaiting review" : "No interns are waiting for approval"} · {all.length} total</p> : null}
+          </div>
+        </div>
         <div className="mb-4 flex flex-wrap items-center gap-2">
           {tabs.map((t) => (
-            <Button key={t} size="sm" variant={tab === t ? "default" : "outline"} onClick={() => setTab(t)} className="capitalize">
-              {t} <span className="ml-1 opacity-70">({count(t)})</span>
+            <Button key={t} size="sm" variant={tab === t ? "default" : "outline"} onClick={() => setTab(t)} aria-pressed={tab === t} className="capitalize">
+              {t} <span className="ml-1 opacity-70">({regs.isSuccess ? count(t) : "—"})</span>
             </Button>
           ))}
           <div className="relative ml-auto min-w-48 flex-1 sm:max-w-xs">
             <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name or email" className="pl-9" aria-label="Search registrations" />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name or email" className="pr-9 pl-9" aria-label="Search registrations" />
+            {search ? <Button variant="ghost" size="icon" className="absolute top-0 right-0 size-9" onClick={() => setSearch("")} aria-label="Clear search" title="Clear search"><X className="size-4" /></Button> : null}
           </div>
-          <Button size="sm" variant="outline" onClick={() => regs.refetch()} aria-label="Refresh">
+          <Button size="icon" variant="outline" disabled={regs.isFetching} onClick={() => regs.refetch()} aria-label="Refresh registrations" title="Refresh registrations">
             <RefreshCw className={cn("size-4", regs.isFetching && "animate-spin")} />
           </Button>
         </div>
         {regs.isLoading ? (
           <LoadingRows />
         ) : regs.error ? (
-          <ErrorState message={(regs.error as Error).message} />
+          <div className="space-y-3 text-center" role="alert">
+            <ErrorState message={(regs.error as Error).message} />
+            <Button variant="outline" onClick={() => regs.refetch()} disabled={regs.isFetching}><RefreshCw className="size-4" />Try again</Button>
+          </div>
         ) : !rows.length ? (
-          <EmptyState title="No registrations here" description="New intern sign-ups appear in Pending." />
+          <div className="flex flex-col items-center px-4 py-10 text-center" role="status">
+            {tab === "pending" && !q ? <CheckCircle2 className="text-status-converted mb-3 size-9" /> : <Search className="text-muted-foreground mb-3 size-9" />}
+            <h2 className="text-base font-semibold">{emptyTitle}</h2>
+            <p className="text-muted-foreground mt-2 max-w-sm text-sm">{emptyDescription}</p>
+            {q ? <Button variant="outline" className="mt-4" onClick={() => setSearch("")}>Clear search</Button> : tab === "pending" && all.length > 0 ? <Button variant="outline" className="mt-4" onClick={() => setTab("all")}>View all registrations</Button> : null}
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
