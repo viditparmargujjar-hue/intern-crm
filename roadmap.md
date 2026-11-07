@@ -1,5 +1,7 @@
 # Setup tasks for remixed project
 
+- [ ] Improve Intern Approvals discovery and loading, error, search, and no-pending states; verify desktop/mobile with real registrations.
+
 - [x] Add compact, immutable deployment version and accurately labeled build timestamp in desktop/mobile navigation; exact last-published time unavailable from the platform.
 
 - [x] Polish intern/admin login and dashboards with scoped presentation-only styling.

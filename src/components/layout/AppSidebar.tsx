@@ -52,9 +52,9 @@ export function SidebarContents({
   const items =
     me?.role === "admin"
       ? [
-          ...navItems,
           { label: "Admin Panel", to: "/admin", icon: ShieldCheck } as const,
           { label: "Intern Approvals", to: "/approvals", icon: UserCheck } as const,
+          ...navItems,
         ]
       : navItems;
   const fetchRegs = useServerFn(listRegistrations);
@@ -81,7 +81,7 @@ export function SidebarContents({
   }
 
   return (
-    <div className={cn("flex h-full flex-col gap-1 py-5", collapsed ? "px-3" : "px-4")}>
+    <div className={cn("flex h-full flex-col gap-1 overflow-y-auto py-5", collapsed ? "px-3" : "px-4")}>
       <div className={cn("mb-5 flex items-center gap-2.5 py-1", collapsed ? "justify-center" : "px-2")}>
         <Logo />
         {!collapsed ? (
@@ -102,18 +102,25 @@ export function SidebarContents({
 
       {!collapsed ? (
         <p className="text-muted-foreground mb-1 px-3 text-[10px] font-semibold tracking-[0.14em] uppercase">
-          Menu
+          {me?.role === "admin" ? "Administration" : "Menu"}
         </p>
       ) : null}
       <nav className="flex flex-col gap-0.5">
         {items.map((item) => {
           const active = isActive(item.to);
           return (
+            <div key={item.to}>
+            {me?.role === "admin" && item.to === "/" ? (
+              <div className="border-border mt-3 mb-2 border-t pt-3">
+                {!collapsed ? <p className="text-muted-foreground px-3 text-[10px] font-semibold uppercase">Workspace</p> : null}
+              </div>
+            ) : null}
             <Link
-              key={item.to}
               to={item.to}
               onClick={onNavigate}
-              title={collapsed ? item.label : undefined}
+              aria-label={collapsed ? item.label : undefined}
+              aria-current={active ? "page" : undefined}
+              title={item.to === "/approvals" && regs.isSuccess ? `Intern Approvals · ${pendingCount} pending` : collapsed ? item.label : undefined}
               className={cn(
                 "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 collapsed && "justify-center px-0",
@@ -126,12 +133,13 @@ export function SidebarContents({
                 <span className="bg-brand absolute top-1.5 bottom-1.5 left-0 w-0.5 rounded-full" />
               ) : null}
               <item.icon className="size-4 shrink-0" />
-              {!collapsed ? item.label : null}
-              {item.to === "/approvals" && pendingCount > 0 ? (
+              {!collapsed ? <span className="min-w-0">{item.label}</span> : null}
+              {item.to === "/approvals" && regs.isSuccess && (!collapsed || pendingCount > 0) ? (
                 <span
                   aria-label={`${pendingCount} pending`}
                   className={cn(
-                    "bg-destructive text-destructive-foreground grid min-w-5 place-items-center rounded-full px-1.5 text-[10px] font-bold",
+                    "grid min-w-5 shrink-0 place-items-center rounded-full px-1.5 text-[10px] font-bold",
+                    pendingCount > 0 ? "bg-destructive text-destructive-foreground" : "bg-muted text-muted-foreground",
                     collapsed ? "absolute top-0.5 right-0.5" : "ml-auto",
                   )}
                 >
@@ -139,6 +147,7 @@ export function SidebarContents({
                 </span>
               ) : null}
             </Link>
+            </div>
           );
         })}
       </nav>
