@@ -23,7 +23,8 @@ import { ThemeSwitcher } from "@/components/layout/ThemeSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { listRegistrations } from "@/lib/admin.functions";
 import { useCurrentUser } from "@/lib/auth";
-import { initials } from "@/lib/crm";
+import { BUILD_ID, BUILD_TIME } from "@/lib/build-info";
+import { formatDateTime, initials } from "@/lib/crm";
 import { cn } from "@/lib/utils";
 
 export const navItems = [
@@ -184,6 +185,12 @@ export function SidebarContents({
             </button>
           </div>
         </div>
+        <p
+          className="text-muted-foreground truncate px-1 text-center text-[10px] tabular-nums"
+          title={`Build ${BUILD_ID} · published ${formatDateTime(BUILD_TIME || null)}`}
+        >
+          {collapsed ? `v${BUILD_ID.slice(-4)}` : `v${BUILD_ID} · ${formatDateTime(BUILD_TIME || null)}`}
+        </p>
       </div>
     </div>
   );
