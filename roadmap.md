@@ -1,6 +1,6 @@
 # Setup tasks for remixed project
 
-- [ ] Add append-only registration review history, reviewer identity and review time; verify history readback and access protection.
+- [x] Add append-only registration review history, reviewer identity and review time; verified successive decisions and reload readback on desktop/mobile, removed test data, and tested access protection.
 
 - [x] Improve Intern Approvals discovery and loading, error, search, and no-pending states; verified desktop/mobile with real registrations.
 
