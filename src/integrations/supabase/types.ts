@@ -391,6 +391,50 @@ export type Database = {
         }
         Relationships: []
       }
+      registration_review_history: {
+        Row: {
+          historical: boolean
+          id: string
+          previous_status: string | null
+          registration_id: string
+          reviewed_at: string
+          reviewed_by: string | null
+          reviewer_email: string | null
+          reviewer_name: string | null
+          status: string
+        }
+        Insert: {
+          historical?: boolean
+          id?: string
+          previous_status?: string | null
+          registration_id: string
+          reviewed_at?: string
+          reviewed_by?: string | null
+          reviewer_email?: string | null
+          reviewer_name?: string | null
+          status: string
+        }
+        Update: {
+          historical?: boolean
+          id?: string
+          previous_status?: string | null
+          registration_id?: string
+          reviewed_at?: string
+          reviewed_by?: string | null
+          reviewer_email?: string | null
+          reviewer_name?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registration_review_history_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registration_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
