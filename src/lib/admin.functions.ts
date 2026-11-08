@@ -45,10 +45,29 @@ export const listRegistrations = createServerFn({ method: "GET" })
     await assertAdmin(context);
     const { data, error } = await context.supabase
       .from("registration_requests")
-      .select("id, user_id, full_name, email, status, created_at, reviewed_at")
+      .select("id, user_id, full_name, email, status, created_at, reviewed_at, reviewed_by")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data;
+  });
+
+/** Admin-only, append-only decisions for one registration. */
+export const listRegistrationHistory = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input?.id ?? ""))
+      throw new Error("Invalid registration");
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { data: history, error } = await context.supabase
+      .from("registration_review_history")
+      .select("id, previous_status, status, reviewed_by, reviewer_name, reviewer_email, reviewed_at, historical")
+      .eq("registration_id", data.id)
+      .order("reviewed_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return history;
   });
 
 /** Admin-only: approve or reject someone else's registration. */
