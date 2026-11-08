@@ -1,5 +1,7 @@
 # Setup tasks for remixed project
 
+- [ ] Add append-only registration review history, reviewer identity and review time; verify history readback and access protection.
+
 - [x] Improve Intern Approvals discovery and loading, error, search, and no-pending states; verified desktop/mobile with real registrations.
 
 - [x] Add compact, immutable deployment version and accurately labeled build timestamp in desktop/mobile navigation; exact last-published time unavailable from the platform.
