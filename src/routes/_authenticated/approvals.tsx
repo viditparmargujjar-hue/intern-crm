@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { ErrorState, LoadingRows, Panel } from "@/components/crm/Surfaces";
+import { RegistrationHistory } from "@/components/crm/RegistrationHistory";
 import { PageHeader } from "@/components/layout/PageHeader";
 import {
   AlertDialog,
@@ -23,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { listRegistrations, reviewRegistration } from "@/lib/admin.functions";
 import { isAdmin } from "@/lib/auth";
-import { formatDate } from "@/lib/crm";
+import { formatDate, formatDateTime } from "@/lib/crm";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/approvals")({
@@ -59,6 +60,7 @@ function ApprovalsPage() {
     onSuccess: (r) => {
       toast.success(r.status === "approved" ? "Intern approved" : "Intern rejected");
       qc.invalidateQueries({ queryKey: ["registrations"] });
+      qc.invalidateQueries({ queryKey: ["registration-history"] });
     },
     onError: (e) => toast.error((e as Error).message),
   });
@@ -129,6 +131,7 @@ function ApprovalsPage() {
                   <th className="py-2 pr-4">Email</th>
                   <th className="py-2 pr-4">Registered</th>
                   <th className="py-2 pr-4">Status</th>
+                  <th className="py-2 pr-4">Last reviewed</th>
                   <th className="py-2">Actions</th>
                 </tr>
               </thead>
@@ -143,7 +146,9 @@ function ApprovalsPage() {
                         {r.status}
                       </Badge>
                     </td>
-                    <td className="flex gap-2 py-2.5">
+                    <td className="py-2.5 pr-4 whitespace-nowrap">{formatDateTime(r.reviewed_at)}</td>
+                    <td className="py-2.5"><div className="flex items-center gap-2">
+                      <RegistrationHistory id={r.id} name={r.full_name} />
                       {(["approved", "rejected"] as const).map((s) => (
                         <AlertDialog key={s}>
                           <AlertDialogTrigger asChild>
@@ -169,7 +174,7 @@ function ApprovalsPage() {
                           </AlertDialogContent>
                         </AlertDialog>
                       ))}
-                    </td>
+                    </div></td>
                   </tr>
                 ))}
               </tbody>
