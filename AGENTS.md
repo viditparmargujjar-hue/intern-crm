@@ -14,3 +14,4 @@
 - Per-user CRM/notification preferences live in the `preferences` jsonb column on `public.users`, parsed via `parsePreferences` in `src/lib/preferences.ts` — always merge with `DEFAULT_PREFERENCES` so old rows keep working.
 - The app-wide date format is a module var in `src/lib/crm.ts` (`setDateFormat`), applied by the authenticated shell from user preferences; new date rendering should use `formatDate`/`formatDateTime`.
 - Deployment identification is injected into the served code by Vite and displayed through shared navigation; never call build time publication time, because publication completion metadata is unavailable to the app.
+- Registration review history is append-only and captured atomically by a database trigger using the authenticated admin identity and database time; legacy entries preserve only the latest known review, never invented earlier decisions.

@@ -15,6 +15,20 @@
       "when": 1793028866787,
       "tag": "0001_restore_crm_triggers",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794155912328,
+      "tag": "0002_registration_review_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794156045377,
+      "tag": "0003_lock_registration_audit_writes",
+      "breakpoints": true
     }
   ]
 }
