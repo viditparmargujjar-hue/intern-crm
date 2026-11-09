@@ -1,6 +1,6 @@
 # Setup tasks for remixed project
 
-- [ ] Add admin, outcome, and inclusive date-range filters to registration review history; verify combined filters and reset.
+- [x] Add admin, outcome, and inclusive date-range filters to registration review history; six tests passed, verified with real history on desktop/mobile including no matches, invalid ranges, and reset.
 
 - [x] Add append-only registration review history, reviewer identity and review time; verified successive decisions and reload readback on desktop/mobile, removed test data, and tested access protection.
 
