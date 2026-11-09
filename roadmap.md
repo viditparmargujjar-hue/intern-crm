@@ -1,5 +1,7 @@
 # Setup tasks for remixed project
 
+- [ ] Add admin, outcome, and inclusive date-range filters to registration review history; verify combined filters and reset.
+
 - [x] Add append-only registration review history, reviewer identity and review time; verified successive decisions and reload readback on desktop/mobile, removed test data, and tested access protection.
 
 - [x] Improve Intern Approvals discovery and loading, error, search, and no-pending states; verified desktop/mobile with real registrations.
