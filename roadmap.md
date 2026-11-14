@@ -1,5 +1,7 @@
 # Setup tasks for remixed project
 
+- [ ] Replace Accounts privileged API with authenticated admin reads and add only the approved role SELECT policy; verify admin/intern/anonymous access. External Vercel verification requires its deployment URL and updated deployment.
+
 - [x] Add admin, outcome, and inclusive date-range filters to registration review history; six tests passed, verified with real history on desktop/mobile including no matches, invalid ranges, and reset.
 
 - [x] Add append-only registration review history, reviewer identity and review time; verified successive decisions and reload readback on desktop/mobile, removed test data, and tested access protection.

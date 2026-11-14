@@ -6,27 +6,27 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const listAccounts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+    const { data: isAdmin, error: roleError } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
       _role: "admin",
     });
-    if (!isAdmin) throw new Error("Only admins can view accounts.");
+    if (roleError || !isAdmin) throw new Error("Only admins can view accounts.");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const [{ data, error }, roles] = await Promise.all([
-      supabaseAdmin.auth.admin.listUsers({ perPage: 200 }),
-      supabaseAdmin.from("user_roles").select("user_id, role").eq("role", "admin"),
+    const [profiles, roles] = await Promise.all([
+      context.supabase.from("profiles").select("id, full_name, email, created_at").order("created_at"),
+      context.supabase.from("user_roles").select("user_id, role").eq("role", "admin"),
     ]);
-    if (error) throw new Error(error.message);
+    if (profiles.error) throw new Error(profiles.error.message);
+    if (roles.error) throw new Error(roles.error.message);
     const admins = new Set((roles.data ?? []).map((r) => r.user_id));
 
-    return data.users.map((u) => ({
+    return (profiles.data ?? []).map((u) => ({
       id: u.id,
       email: u.email ?? "",
-      name: (u.user_metadata?.["full_name"] as string | undefined) ?? u.email ?? "",
+      name: u.full_name ?? u.email ?? "",
       role: admins.has(u.id) ? "admin" : "intern",
       created_at: u.created_at,
-      last_sign_in_at: u.last_sign_in_at ?? null,
+      last_sign_in_at: null as string | null,
     }));
   });
 

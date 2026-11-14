@@ -104,7 +104,7 @@ function AdminPage() {
                   <th className="py-2 pr-4">Name</th>
                   <th className="py-2 pr-4">Email</th>
                   <th className="py-2 pr-4">Role</th>
-                  <th className="py-2 pr-4">Joined</th>
+                  <th className="py-2 pr-4">Profile created</th>
                   <th className="py-2 pr-4">Last sign-in</th>
                   <th className="py-2" />
                 </tr>
