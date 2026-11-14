@@ -29,6 +29,13 @@
       "when": 1794156045377,
       "tag": "0003_lock_registration_audit_writes",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794664464635,
+      "tag": "0004_admins_read_account_roles",
+      "breakpoints": true
     }
   ]
 }
