@@ -16,3 +16,4 @@
 - Deployment identification is injected into the served code by Vite and displayed through shared navigation; never call build time publication time, because publication completion metadata is unavailable to the app.
 - Registration review history is append-only and captured atomically by a database trigger using the authenticated admin identity and database time; legacy entries preserve only the latest known review, never invented earlier decisions.
 - Filter already-authorized registration history in a browser-safe helper using reviewer identity and inclusive viewer-local calendar dates; filtering never changes audit records or access controls.
+- Accounts reads profiles and roles through the authenticated admin session with a server-side has_role check and RLS; avoid privileged Auth API dependencies for external hosting, and never represent profile timestamps as authentication joined dates.
